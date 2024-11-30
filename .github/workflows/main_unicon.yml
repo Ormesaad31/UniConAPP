@@ -1,8 +1,7 @@
 # Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
 # More GitHub Actions for Azure: https://github.com/Azure/actions
-# More info on Python, GitHub Actions, and Azure App Service: https://aka.ms/python-webapps-actions
 
-name: Build and deploy Python app to Azure Web App - Unicon
+name: Build and deploy ASP.Net Core app to Azure Web App - Unicon
 
 on:
   push:
@@ -17,31 +16,22 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python version
-        uses: actions/setup-python@v5
+      - name: Set up .NET Core
+        uses: actions/setup-dotnet@v4
         with:
-          python-version: '3.11'
+          dotnet-version: '9.x'
 
-      - name: Create and start virtual environment
-        run: |
-          python -m venv venv
-          source venv/bin/activate
-      
-      - name: Install dependencies
-        run: pip install -r requirements.txt
-        
-      # Optional: Add step to run tests here (PyTest, Django test suites, etc.)
+      - name: Build with dotnet
+        run: dotnet build --configuration Release
 
-      - name: Zip artifact for deployment
-        run: zip release.zip ./* -r
+      - name: dotnet publish
+        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
 
-      - name: Upload artifact for deployment jobs
+      - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
-          name: python-app
-          path: |
-            release.zip
-            !venv/
+          name: .net-app
+          path: ${{env.DOTNET_ROOT}}/myapp
 
   deploy:
     runs-on: ubuntu-latest
@@ -56,23 +46,20 @@ jobs:
       - name: Download artifact from build job
         uses: actions/download-artifact@v4
         with:
-          name: python-app
-
-      - name: Unzip artifact for deployment
-        run: unzip release.zip
-
+          name: .net-app
       
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_81DDAEB8A1E54FB99C93ADDF054A4F28 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_9DB12106F60945BB8891A5817AE56711 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_D96C138A94CB42F7A61F230D131AAC30 }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_169216F27B584F768EA8D84BEAA3C7A6 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_EFCDA399BBE24F5C8945A335396BCC00 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_9B608913FFAA4DCCB9F61EF98413CF41 }}
 
-      - name: 'Deploy to Azure Web App'
-        uses: azure/webapps-deploy@v3
+      - name: Deploy to Azure Web App
         id: deploy-to-webapp
+        uses: azure/webapps-deploy@v3
         with:
           app-name: 'Unicon'
           slot-name: 'Production'
+          package: .
           
