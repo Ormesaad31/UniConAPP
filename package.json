@@ -1,5 +1,6 @@
 {
   "name": "azure-function-node-app",
+  "type": "module",
   "version": "1.0.0",
   "description": "A Node.js application to interact with an Azure Function",
   "main": "index.js",
