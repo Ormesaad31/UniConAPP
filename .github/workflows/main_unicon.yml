@@ -15,11 +15,12 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Login to Azure
-        uses: azure/login@v2
+        uses: azure/login@v1
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_D0F12200CBC54BD38A9C4B507F3A1EDA }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_6BC80C23D5174E839DF0892B0419D1DE }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_8DB2B87708CB42D696B047A92F812DC9 }}
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          auth-type: oidc
 
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
