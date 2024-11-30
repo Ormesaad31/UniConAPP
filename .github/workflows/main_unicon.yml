@@ -42,5 +42,5 @@ jobs:
         with:
           app-name: 'Unicon'
           slot-name: 'Production'
-          package: . # Déploie tous les fichiers présents dans l'artefact
+          package: ./ # Déploie tous les fichiers présents dans l'artefact
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_355F70F426C94AE3AF07C238A2D53718 }}
