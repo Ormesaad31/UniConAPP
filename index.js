@@ -4,7 +4,7 @@ const fetch = require('node-fetch');
 
 const app = express();
 
-const PORT = 8080;
+const PORT = 8000;
 // Middleware to serve static files and parse JSON
 app.use(express.static('public'));
 app.use(bodyParser.json());
