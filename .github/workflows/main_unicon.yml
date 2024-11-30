@@ -1,10 +1,9 @@
 name: Deploy Static HTML App to Azure Web App - Unicon
+on: [push]
 
-on:
-  push:
-    branches:
-      - main
-  workflow_dispatch:
+permissions:
+  id-token: write
+  contents: read
 
 jobs:
   deploy:
