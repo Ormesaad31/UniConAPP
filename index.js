@@ -37,7 +37,7 @@ app.get('/', (req, res) => {
                         headers: {
                             'Content-Type': 'application/json',
                         },
-                        body: JSON.stringify({ message: inputMessage })
+                        body: JSON.stringify({ name: inputMessage })
                     })
                     .then(response => response.json())
                     .then(data => {
@@ -56,13 +56,13 @@ app.get('/', (req, res) => {
 // API endpoint to interact with the Azure Function
 app.post('/sendMessage', async (req, res) => {
     try {
-        const { message } = req.body;
+        const { name } = req.body;
         const response = await fetch(functionUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ message }),
+            body: JSON.stringify({ name }),
         });
         const data = await response.json();
         res.json(data);
