@@ -1,10 +1,10 @@
-const express = require('express');
-const bodyParser = require('body-parser');
-const fetch = require('node-fetch');
+import express from 'express';
+import bodyParser from 'body-parser';
+import fetch from 'node-fetch';
 
 const app = express();
 
-const PORT = 8000;
+const PORT = 8080;
 // Middleware to serve static files and parse JSON
 app.use(express.static('public'));
 app.use(bodyParser.json());
