@@ -9,7 +9,7 @@ app.use(express.static('public'));
 app.use(bodyParser.json());
 
 // Azure Function URL
-const functionUrl = 'https://unicon-function-app.azurewebsites.net/api/unicon-function-app?code=FadYyfHHlq__4DPQg5AiSGB19cjr-e9K87HSoT8ieSGIAzFuZIw1Hw==';
+const functionUrl = 'https://bestunicon.azurewebsites.net/api/AddFunction?code=UkjT-AC4hiNtIfH7GBDoWougR5oDGfOhnXgKu9y-gpPEAzFubt5ixQ==';
 
 // Route to render the front-end HTML
 app.get('/', (req, res) => {
