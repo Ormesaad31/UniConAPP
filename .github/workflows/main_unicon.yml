@@ -1,4 +1,4 @@
-name: Deploy HTML App to Azure Web App - Unicon
+name: Deploy Static Site to Azure Web App - Unicon
 
 on:
   push:
@@ -11,36 +11,28 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Étape 1 : Cloner le code source
       - uses: actions/checkout@v4
 
-      # Étape 2 : Charger les artefacts (HTML, CSS, JS)
-      - name: Upload HTML files for deployment
+      - name: Upload Static Site Files
         uses: actions/upload-artifact@v4
         with:
-          name: html-app
-          path: . # Inclut tous les fichiers à partir du répertoire racine (index.html, etc.)
+          name: static-site
+          path: ./ # Include all files (index.html, CSS, JS, etc.)
 
   deploy:
     runs-on: ubuntu-latest
     needs: build
-    environment:
-      name: 'Production'
-      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
 
     steps:
-      # Étape 1 : Télécharger les artefacts depuis l'étape de build
-      - name: Download artifact from build job
+      - name: Download Static Site Files
         uses: actions/download-artifact@v4
         with:
-          name: html-app
+          name: static-site
 
-      # Étape 2 : Déployer sur Azure Web App
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
           app-name: 'Unicon'
-          slot-name: 'Production'
-          package: ./ # Déploie tous les fichiers présents dans l'artefact
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_355F70F426C94AE3AF07C238A2D53718 }}
+          package: ./ # Ensure this points to the correct folder
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
