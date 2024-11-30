@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connect to Azure Function</title>
+</head>
+<body>
+    <h1>Test Azure Function</h1>
+    <input type="text" id="inputMessage" placeholder="Enter a message">
+    <button id="sendButton">Send to Azure Function</button>
+    <div id="response"></div>
+
+    <script>
+        // URL of the deployed Azure Function
+        const functionUrl = 'https://unicon-function-app.azurewebsites.net/api/unicon-function-app?code=FadYyfHHlq__4DPQg5AiSGB19cjr-e9K87HSoT8ieSGIAzFuZIw1Hw==';
+
+        document.getElementById('sendButton').addEventListener('click', function () {
+            const inputMessage = document.getElementById('inputMessage').value;
+
+            // Sending a POST request to the Azure Function
+            fetch(functionUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ message: inputMessage })
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('response').innerText = `Function Response: ${JSON.stringify(data)}`;
+            })
+            .catch(error => {
+                document.getElementById('response').innerText = `Error: ${error.message}`;
+            });
+        });
+    </script>
+</body>
+</html>
