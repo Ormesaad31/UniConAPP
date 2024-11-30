@@ -3,8 +3,8 @@ const bodyParser = require('body-parser');
 const fetch = require('node-fetch');
 
 const app = express();
-const PORT = 3000;
 
+const PORT = 8080;
 // Middleware to serve static files and parse JSON
 app.use(express.static('public'));
 app.use(bodyParser.json());
@@ -73,7 +73,7 @@ app.post('/sendMessage', async (req, res) => {
 });
 
 // Start the server
-const PORT = 8080;
+
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });
