@@ -1,7 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const fetch = require('node-fetch');
-
+import fetch from "node-fetch";
 const app = express();
 
 const PORT = 8080;
