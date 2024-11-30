@@ -1,7 +1,4 @@
-# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
-# More GitHub Actions for Azure: https://github.com/Azure/actions
-
-name: Build and deploy ASP.Net Core app to Azure Web App - Unicon
+name: Deploy HTML App to Azure Web App - Unicon
 
 on:
   push:
@@ -14,24 +11,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Étape 1 : Cloner le code source
       - uses: actions/checkout@v4
 
-      - name: Set up .NET Core
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '9.x'
-
-      - name: Build with dotnet
-        run: dotnet build --configuration Release
-
-      - name: dotnet publish
-        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
-
-      - name: Upload artifact for deployment job
+      # Étape 2 : Charger les artefacts (HTML, CSS, JS)
+      - name: Upload HTML files for deployment
         uses: actions/upload-artifact@v4
         with:
-          name: .net-app
-          path: ${{env.DOTNET_ROOT}}/myapp
+          name: html-app
+          path: . # Inclut tous les fichiers à partir du répertoire racine (index.html, etc.)
 
   deploy:
     runs-on: ubuntu-latest
@@ -39,18 +27,20 @@ jobs:
     environment:
       name: 'Production'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
-    
+
     steps:
+      # Étape 1 : Télécharger les artefacts depuis l'étape de build
       - name: Download artifact from build job
         uses: actions/download-artifact@v4
         with:
-          name: .net-app
-      
+          name: html-app
+
+      # Étape 2 : Déployer sur Azure Web App
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
           app-name: 'Unicon'
           slot-name: 'Production'
-          package: .
+          package: . # Déploie tous les fichiers présents dans l'artefact
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_355F70F426C94AE3AF07C238A2D53718 }}
