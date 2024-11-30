@@ -1,0 +1,9 @@
+{
+  "name": "static-site",
+  "version": "1.0.0",
+  "description": "A static HTML site",
+  "main": "index.html",
+  "scripts": {},
+  "author": "",
+  "license": "ISC"
+}
