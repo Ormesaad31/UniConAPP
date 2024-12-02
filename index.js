@@ -14,7 +14,7 @@ const functionUrl = 'https://bestunicon.azurewebsites.net/api/AddFunction?code=U
 // Route to render the front-end HTML
 app.get('/', async (req, res) => {
     try {
-        const response = await fetch(azureFunctionUrl, {
+        const response = await fetch(functionUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ action: 'getEmployees' }),
@@ -112,7 +112,7 @@ app.get('/', async (req, res) => {
 // Route for sending data to the Azure Function
 app.post('/addLeave', async (req, res) => {
     try {
-        const response = await fetch(azureFunctionUrl, {
+        const response = await fetch(functionUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ action: 'addEmployeeAndLeave', ...req.body }),
