@@ -19,29 +19,38 @@ app.get('/', (req, res) => {
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Connect to Azure Function</title>
+            <title>Date Selection</title>
         </head>
         <body>
-            <h1>Test Azure Function</h1>
-            <input type="text" id="inputMessage" placeholder="Enter a message">
-            <button id="sendButton">Send to Azure Function</button>
+            <h1>Select Two Dates</h1>
+            <form id="dateForm">
+                <label for="startDate">Start Date:</label>
+                <input type="date" id="startDate" name="startDate" required>
+                <br><br>
+                <label for="endDate">End Date:</label>
+                <input type="date" id="endDate" name="endDate" required>
+                <br><br>
+                <button type="submit">Confirm Selection</button>
+            </form>
             <div id="response"></div>
 
             <script>
-                document.getElementById('sendButton').addEventListener('click', function () {
-                    const inputMessage = document.getElementById('inputMessage').value;
+                document.getElementById('dateForm').addEventListener('submit', function (event) {
+                    event.preventDefault(); // Empêche le rechargement de la page
+                    const startDate = document.getElementById('startDate').value;
+                    const endDate = document.getElementById('endDate').value;
 
-                    // Sending a POST request to the server
-                    fetch('/sendMessage', {
+                    // Envoi de la requête POST au serveur
+                    fetch('/sendDates', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
                         },
-                        body: JSON.stringify({ name: inputMessage })
+                        body: JSON.stringify({ startDate, endDate })
                     })
                     .then(response => response.json())
                     .then(data => {
-                        document.getElementById('response').innerText = \`Function Response: \${JSON.stringify(data)}\`;
+                        document.getElementById('response').innerText = \`Server Response: \${JSON.stringify(data)}\`;
                     })
                     .catch(error => {
                         document.getElementById('response').innerText = \`Error: \${error.message}\`;
@@ -53,24 +62,19 @@ app.get('/', (req, res) => {
     `);
 });
 
-// API endpoint to interact with the Azure Function
-app.post('/sendMessage', async (req, res) => {
+// API pour recevoir les dates et les traiter
+app.post('/sendDates', (req, res) => {
     try {
-        const { name } = req.body;
-        const response = await fetch(functionUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ name }),
-        });
-        const data = await response.json();
-        res.json(data);
+        const { startDate, endDate } = req.body;
+        if (!startDate || !endDate) {
+            throw new Error('Both dates are required.');
+        }
+        // Exemple de traitement des données
+        res.json({ message: 'Dates received successfully!', startDate, endDate });
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(400).json({ error: error.message });
     }
 });
-
 // Start the server
 
 app.listen(PORT, () => {
