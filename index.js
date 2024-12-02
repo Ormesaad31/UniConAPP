@@ -1,7 +1,6 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import fetch from 'node-fetch';
-import sql from 'mssql';
 const app = express();
 
 const PORT = 8080;
