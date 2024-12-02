@@ -36,12 +36,12 @@ app.get('/', (req, res) => {
 
             <script>
                 document.getElementById('dateForm').addEventListener('submit', function (event) {
-                    event.preventDefault(); // Empêche le rechargement de la page
+                    event.preventDefault(); // Prevent page reload
                     const startDate = document.getElementById('startDate').value;
                     const endDate = document.getElementById('endDate').value;
 
-                    // Envoi de la requête POST au serveur
-                    fetch('/sendDates', {
+                    // Send a POST request to the Azure Function
+                    fetch('${functionUrl}', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -62,17 +62,29 @@ app.get('/', (req, res) => {
     `);
 });
 
-// API pour recevoir les dates et les traiter
-app.post('/sendDates', (req, res) => {
+// API endpoint to interact with the Azure Function
+app.post('/sendDates', async (req, res) => {
     try {
         const { startDate, endDate } = req.body;
+
         if (!startDate || !endDate) {
-            throw new Error('Both dates are required.');
+            return res.status(400).json({ error: 'Both startDate and endDate are required.' });
         }
-        // Exemple de traitement des données
-        res.json({ message: 'Dates received successfully!', startDate, endDate });
+
+        // Sending the POST request to the Azure Function
+        const response = await fetch(functionUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ startDate, endDate }),
+        });
+
+        // Parsing the response from the Azure Function
+        const data = await response.json();
+        res.json(data);
     } catch (error) {
-        res.status(400).json({ error: error.message });
+        res.status(500).json({ error: error.message });
     }
 });
 // Start the server
