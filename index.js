@@ -85,7 +85,10 @@ app.get('/', (req, res) => {
                     const prenom = document.getElementById('prenom').value;
                     const email = document.getElementById('email').value;
                     const imageFile = document.getElementById('image').files[0];
+                    const fileName = imageFile.name;
+                    const fileExtension = fileName.substring(fileName.lastIndexOf('.') + 1).toLowerCase();
 
+                    
                     if (!imageFile) {
                         alert('Veuillez sélectionner une image.');
                         return;
@@ -98,7 +101,7 @@ app.get('/', (req, res) => {
                         const response = await fetch(functionUrl, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ action: 'addEmployee', nom, prenom, email, image: imageBase64 })
+                            body: JSON.stringify({ action: 'addEmployee', nom, prenom, email, image: imageBase64,fileExtension:fileExtension })
                         });
                         const result = await response.json();
                         document.getElementById('employeeAddResponse').innerText = JSON.stringify(result);
