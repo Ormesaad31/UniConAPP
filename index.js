@@ -93,7 +93,8 @@ app.get('/', (req, res) => {
                         alert('Veuillez sélectionner une image.');
                         return;
                     }
-
+                    
+                    const fileMimeType = imageFile.type;
                     const reader = new FileReader();
                     reader.onloadend = async () => {
                         const imageBase64 = reader.result.split(',')[1]; // Récupérer la partie base64
