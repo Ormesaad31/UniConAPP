@@ -1,9 +1,10 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import fetch from 'node-fetch';
-const app = express();
 
+const app = express();
 const PORT = 8080;
+
 // Middleware to serve static files and parse JSON
 app.use(express.static('public'));
 app.use(bodyParser.json());
@@ -19,43 +20,102 @@ app.get('/', (req, res) => {
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Date Selection</title>
+            <title>Gestion des Congés</title>
         </head>
         <body>
-            <h1>Select Two Dates</h1>
+            <h1>Gestion des Congés</h1>
+
+            <!-- Formulaire pour ajouter un employé -->
+            <h2>Ajouter un Employé</h2>
+            <form id="addEmployeeForm">
+                <label>Nom:</label>
+                <input type="text" id="nom" required>
+                <label>Prénom:</label>
+                <input type="text" id="prenom" required>
+                <label>Email:</label>
+                <input type="email" id="email" required>
+                <button type="submit">Ajouter</button>
+            </form>
+            <div id="employeeAddResponse"></div>
+
+            <!-- Sélectionner un employé existant -->
+            <h2>Sélectionner un Employé</h2>
+            <select id="employeeSelect">
+                <option value="">-- Sélectionnez un employé --</option>
+            </select>
+
+            <!-- Formulaire pour sélectionner des dates -->
+            <h2>Sélectionner Deux Dates</h2>
             <form id="dateForm">
-                <label for="startDate">Start Date:</label>
-                <input type="date" id="startDate" name="startDate" required>
-                <br><br>
-                <label for="endDate">End Date:</label>
-                <input type="date" id="endDate" name="endDate" required>
-                <br><br>
-                <button type="submit">Confirm Selection</button>
+                <label>Date de Début:</label>
+                <input type="date" id="startDate" required>
+                <label>Date de Fin:</label>
+                <input type="date" id="endDate" required>
+                <button type="submit">Confirmer</button>
             </form>
             <div id="response"></div>
 
             <script>
-                document.getElementById('dateForm').addEventListener('submit', function (event) {
-                    event.preventDefault(); // Prevent page reload
+                const functionUrl = '${functionUrl}';
+
+                // Charger les employés
+                async function loadEmployees() {
+                    const response = await fetch(functionUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ action: 'getEmployees' })
+                    });
+                    const employees = await response.json();
+                    const select = document.getElementById('employeeSelect');
+                    select.innerHTML = '<option value="">-- Sélectionnez un employé --</option>';
+                    employees.forEach(emp => {
+                        const option = document.createElement('option');
+                        option.value = emp.id;
+                        option.textContent = \`\${emp.nom} \${emp.prenom} (\${emp.email})\`;
+                        select.appendChild(option);
+                    });
+                }
+
+                // Ajouter un employé
+                document.getElementById('addEmployeeForm').addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const nom = document.getElementById('nom').value;
+                    const prenom = document.getElementById('prenom').value;
+                    const email = document.getElementById('email').value;
+
+                    const response = await fetch(functionUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ action: 'addEmployee', nom, prenom, email })
+                    });
+                    const result = await response.json();
+                    document.getElementById('employeeAddResponse').innerText = JSON.stringify(result);
+                    loadEmployees(); // Reload employees
+                });
+
+                // Ajouter un congé
+                document.getElementById('dateForm').addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const employeeId = document.getElementById('employeeSelect').value;
                     const startDate = document.getElementById('startDate').value;
                     const endDate = document.getElementById('endDate').value;
 
-                    // Send a POST request to the Azure Function
-                    fetch('${functionUrl}', {
+                    if (!employeeId) {
+                        alert('Veuillez sélectionner un employé.');
+                        return;
+                    }
+
+                    const response = await fetch(functionUrl, {
                         method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({ startDate, endDate })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        document.getElementById('response').innerText = \`Server Response: \${JSON.stringify(data)}\`;
-                    })
-                    .catch(error => {
-                        document.getElementById('response').innerText = \`Error: \${error}\`;
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ action: 'addLeave', employeeId, startDate, endDate })
                     });
+                    const result = await response.json();
+                    document.getElementById('response').innerText = JSON.stringify(result);
                 });
+
+                // Charger les employés au chargement de la page
+                window.onload = loadEmployees;
             </script>
         </body>
         </html>
@@ -63,12 +123,12 @@ app.get('/', (req, res) => {
 });
 
 // API endpoint to interact with the Azure Function
-app.post('/sendDates', async (req, res) => {
+app.post('/sendRequest', async (req, res) => {
     try {
-        const { startDate, endDate } = req.body;
+        const { action, ...rest } = req.body;
 
-        if (!startDate || !endDate) {
-            return res.status(400).json({ error: 'Both startDate and endDate are required.' });
+        if (!action) {
+            return res.status(400).json({ error: 'Action is required.' });
         }
 
         // Sending the POST request to the Azure Function
@@ -77,7 +137,7 @@ app.post('/sendDates', async (req, res) => {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ startDate, endDate }),
+            body: JSON.stringify({ action, ...rest }),
         });
 
         // Parsing the response from the Azure Function
@@ -87,8 +147,8 @@ app.post('/sendDates', async (req, res) => {
         res.status(500).json({ error: error });
     }
 });
-// Start the server
 
+// Start the server
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });
