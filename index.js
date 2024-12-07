@@ -33,6 +33,8 @@ app.get('/', (req, res) => {
                 <input type="text" id="prenom" required>
                 <label>Email:</label>
                 <input type="email" id="email" required>
+                <label>Photo:</label>
+                <input type="file" id="image" accept="image/*" required>
                 <button type="submit">Ajouter</button>
             </form>
             <div id="employeeAddResponse"></div>
@@ -75,21 +77,34 @@ app.get('/', (req, res) => {
                     });
                 }
 
-                // Ajouter un employé
+                // Ajouter un employé avec une image
                 document.getElementById('addEmployeeForm').addEventListener('submit', async (e) => {
                     e.preventDefault();
+                    
                     const nom = document.getElementById('nom').value;
                     const prenom = document.getElementById('prenom').value;
                     const email = document.getElementById('email').value;
+                    const imageFile = document.getElementById('image').files[0];
 
-                    const response = await fetch(functionUrl, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ action: 'addEmployee', nom, prenom, email })
-                    });
-                    const result = await response.json();
-                    document.getElementById('employeeAddResponse').innerText = JSON.stringify(result);
-                    loadEmployees(); // Reload employees
+                    if (!imageFile) {
+                        alert('Veuillez sélectionner une image.');
+                        return;
+                    }
+
+                    const reader = new FileReader();
+                    reader.onloadend = async () => {
+                        const imageBase64 = reader.result.split(',')[1]; // Récupérer la partie base64
+
+                        const response = await fetch(functionUrl, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ action: 'addEmployee', nom, prenom, email, image: imageBase64 })
+                        });
+                        const result = await response.json();
+                        document.getElementById('employeeAddResponse').innerText = JSON.stringify(result);
+                        loadEmployees(); // Recharger les employés
+                    };
+                    reader.readAsDataURL(imageFile);
                 });
 
                 // Ajouter un congé
