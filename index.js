@@ -53,7 +53,7 @@ app.get('/', (req, res) => {
                         document.getElementById('response').innerText = \`Server Response: \${JSON.stringify(data)}\`;
                     })
                     .catch(error => {
-                        document.getElementById('response').innerText = \`Error: \${error.message}\`;
+                        document.getElementById('response').innerText = \`Error: \${error}\`;
                     });
                 });
             </script>
