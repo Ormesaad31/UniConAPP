@@ -97,11 +97,12 @@ app.get('/', (req, res) => {
                     const reader = new FileReader();
                     reader.onloadend = async () => {
                         const imageBase64 = reader.result.split(',')[1]; // Récupérer la partie base64
-
+                            const fileBuffer = reader.result; // This gives you the file as an ArrayBuffer (raw data)
+                            const blob = new Blob([fileBuffer], { type: fileMimeType });
                         const response = await fetch(functionUrl, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ action: 'addEmployee', nom, prenom, email, image: imageBase64,fileExtension:fileExtension })
+                            body: JSON.stringify({ action: 'addEmployee', nom, prenom, email, image: blob,fileExtension:fileExtension })
                         });
                         const result = await response.json();
                         document.getElementById('employeeAddResponse').innerText = JSON.stringify(result);
