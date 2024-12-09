@@ -1,9 +1,10 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import fetch from 'node-fetch';
-const app = express();
 
+const app = express();
 const PORT = 8080;
+
 // Middleware to serve static files and parse JSON
 app.use(express.static('public'));
 app.use(bodyParser.json());
@@ -44,6 +45,8 @@ app.get('/', (req, res) => {
             <select id="employeeSelect">
                 <option value="">-- Sélectionnez un employé --</option>
             </select>
+            <h2>Image de l'Employé</h2>
+            <img id="employeeImage" src="" alt="Image de l'employé" style="max-width: 200px; display: none;">
 
             <!-- Formulaire pour sélectionner des dates -->
             <h2>Sélectionner Deux Dates</h2>
@@ -73,22 +76,42 @@ app.get('/', (req, res) => {
                         const option = document.createElement('option');
                         option.value = emp.id;
                         option.textContent = \`\${emp.nom} \${emp.prenom} (\${emp.email})\`;
+                        option.dataset.employee = JSON.stringify(emp); // Attache les données de l'employé
                         select.appendChild(option);
                     });
                 }
 
-                // Ajouter un employé avec une image
+                // Afficher l'image de l'employé
+                document.getElementById('employeeSelect').addEventListener('change', () => {
+                    const select = document.getElementById('employeeSelect');
+                    const selectedOption = select.options[select.selectedIndex];
+                    const employeeImage = document.getElementById('employeeImage');
+
+                    if (selectedOption && selectedOption.value) {
+                        const employeeData = JSON.parse(selectedOption.dataset.employee);
+
+                        if (employeeData.imageUrl) {
+                            employeeImage.src = employeeData.imageUrl;
+                            employeeImage.style.display = 'block';
+                        } else {
+                            employeeImage.src = '';
+                            employeeImage.style.display = 'none';
+                        }
+                    } else {
+                        employeeImage.src = '';
+                        employeeImage.style.display = 'none';
+                    }
+                });
+
+                // Ajouter un employé
                 document.getElementById('addEmployeeForm').addEventListener('submit', async (e) => {
                     e.preventDefault();
-                    
+
                     const nom = document.getElementById('nom').value;
                     const prenom = document.getElementById('prenom').value;
                     const email = document.getElementById('email').value;
                     const imageFile = document.getElementById('image').files[0];
-                    const fileName = imageFile.name;
-                    const fileExtension = fileName.substring(fileName.lastIndexOf('.') + 1).toLowerCase();
 
-                    
                     if (!imageFile) {
                         alert('Veuillez sélectionner une image.');
                         return;
@@ -96,12 +119,13 @@ app.get('/', (req, res) => {
 
                     const reader = new FileReader();
                     reader.onloadend = async () => {
-                        const imageBase64 = reader.result.split(',')[1]; // Récupérer la partie base64
+                        const imageBase64 = reader.result.split(',')[1];
+                        const fileExtension = imageFile.name.split('.').pop().toLowerCase();
 
                         const response = await fetch(functionUrl, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ action: 'addEmployee', nom, prenom, email, image: imageBase64,fileExtension:fileExtension })
+                            body: JSON.stringify({ action: 'addEmployee', nom, prenom, email, image: imageBase64, fileExtension })
                         });
                         const result = await response.json();
                         document.getElementById('employeeAddResponse').innerText = JSON.stringify(result);
@@ -113,6 +137,7 @@ app.get('/', (req, res) => {
                 // Ajouter un congé
                 document.getElementById('dateForm').addEventListener('submit', async (e) => {
                     e.preventDefault();
+
                     const employeeId = document.getElementById('employeeSelect').value;
                     const startDate = document.getElementById('startDate').value;
                     const endDate = document.getElementById('endDate').value;
@@ -148,20 +173,16 @@ app.post('/sendRequest', async (req, res) => {
             return res.status(400).json({ error: 'Action is required.' });
         }
 
-        // Sending the POST request to the Azure Function
         const response = await fetch(functionUrl, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ action, ...rest }),
         });
 
-        // Parsing the response from the Azure Function
         const data = await response.json();
         res.json(data);
     } catch (error) {
-        res.status(500).json({ error: error });
+        res.status(500).json({ error: error.message });
     }
 });
 
