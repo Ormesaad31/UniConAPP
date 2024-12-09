@@ -21,43 +21,157 @@ app.get('/', (req, res) => {
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <title>Gestion des Congés</title>
-        </head>
-        <body>
-            <h1>Gestion des Congés</h1>
+           <style>
+        /* Global styles */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f7fa;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
 
-            <!-- Formulaire pour ajouter un employé -->
-            <h2>Ajouter un Employé</h2>
-            <form id="addEmployeeForm">
-                <label>Nom:</label>
+        h1 {
+            color: #004080;
+        }
+
+        h2 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        /* Container styles */
+        .container {
+            width: 90%;
+            max-width: 800px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        /* Form styles */
+        form {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input, select, button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        input[type="file"] {
+            padding: 5px;
+        }
+
+        button {
+            background-color: #004080;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        /* Responsive design */
+        @media (min-width: 600px) {
+            .form-group {
+                display: flex;
+                gap: 15px;
+            }
+
+            .form-group label, .form-group input {
+                flex: 1;
+            }
+        }
+
+        /* Response areas */
+        #response, #employeeAddResponse {
+            background: #e9f7e9;
+            color: #28a745;
+            padding: 10px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            display: none;
+        }
+
+        #response.error, #employeeAddResponse.error {
+            background: #f8d7da;
+            color: #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <h1>Gestion des Congés</h1>
+    <div class="container">
+        <!-- Formulaire pour ajouter un employé -->
+        <h2>Ajouter un Employé</h2>
+        <form id="addEmployeeForm">
+            <div class="form-group">
+                <label for="nom">Nom:</label>
                 <input type="text" id="nom" required>
-                <label>Prénom:</label>
+            </div>
+            <div class="form-group">
+                <label for="prenom">Prénom:</label>
                 <input type="text" id="prenom" required>
-                <label>Email:</label>
+            </div>
+            <div class="form-group">
+                <label for="email">Email:</label>
                 <input type="email" id="email" required>
-                <label>Photo:</label>
+            </div>
+            <div class="form-group">
+                <label for="image">Photo:</label>
                 <input type="file" id="image" accept="image/*" required>
-                <button type="submit">Ajouter</button>
-            </form>
-            <div id="employeeAddResponse"></div>
+            </div>
+            <button type="submit">Ajouter</button>
+        </form>
+        <div id="employeeAddResponse"></div>
+    </div>
 
-            <!-- Sélectionner un employé existant -->
-            <h2>Sélectionner un Employé</h2>
-            <select id="employeeSelect">
-                <option value="">-- Sélectionnez un employé --</option>
-            </select>
-            <h2>Image de l'Employé</h2>
-            <img id="employeeImage" src="" alt="Image de l'employé" style="max-width: 200px; display: none;">
+    <div class="container">
+        <!-- Sélectionner un employé existant -->
+        <h2>Sélectionner un Employé</h2>
+        <select id="employeeSelect">
+            <option value="">-- Sélectionnez un employé --</option>
+        </select>
+    </div>
 
-            <!-- Formulaire pour sélectionner des dates -->
-            <h2>Sélectionner Deux Dates</h2>
-            <form id="dateForm">
-                <label>Date de Début:</label>
+    <div class="container">
+        <!-- Formulaire pour sélectionner des dates -->
+        <h2>Sélectionner Deux Dates</h2>
+        <form id="dateForm">
+            <div class="form-group">
+                <label for="startDate">Date de Début:</label>
                 <input type="date" id="startDate" required>
-                <label>Date de Fin:</label>
+            </div>
+            <div class="form-group">
+                <label for="endDate">Date de Fin:</label>
                 <input type="date" id="endDate" required>
-                <button type="submit">Confirmer</button>
-            </form>
-            <div id="response"></div>
+            </div>
+            <button type="submit">Confirmer</button>
+        </form>
+        <div id="response"></div>
+    </div>
 
             <script>
                 const functionUrl = '${functionUrl}';
