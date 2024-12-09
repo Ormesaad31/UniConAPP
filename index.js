@@ -151,6 +151,7 @@ app.get('/', (req, res) => {
     <div class="container">
         <!-- Sélectionner un employé existant -->
         <h2>Sélectionner un Employé</h2>
+        <img id="employeeImage" src="" alt="Image de l'employé" style="max-width: 200px; display: none;">
         <select id="employeeSelect">
             <option value="">-- Sélectionnez un employé --</option>
         </select>
